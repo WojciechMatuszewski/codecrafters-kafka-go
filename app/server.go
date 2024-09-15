@@ -2,9 +2,7 @@ package main
 
 import (
 	"context"
-	"errors"
 	"fmt"
-	"io"
 	"net"
 	"os/signal"
 	"syscall"
@@ -89,16 +87,17 @@ func connectionLoop(connection net.Conn) {
 
 	received := make([]byte, 1024)
 	for {
-		_, err := connection.Read(received)
-		if err != nil {
-			if errors.Is(err, io.EOF) {
-				continue
-			}
-			fmt.Println("Failed to read:", err)
-			continue
-		}
+		connection.Read(received)
+		// if err != nil {
+		// 	if errors.Is(err, io.EOF) {
+		// 		continue
+		// 	}
 
-		fmt.Println(string(received))
+		// 	fmt.Println("Failed to read:", err)
+		// 	continue
+		// }
+
+		fmt.Println("Received data:", string(received))
 
 		header := make([]byte, 4)
 		message := []byte{0x00, 0x00, 0x00, 0x07}
@@ -107,7 +106,7 @@ func connectionLoop(connection net.Conn) {
 		response = append(response, header...)
 		response = append(response, message...)
 
-		_, err = connection.Write(response)
+		_, err := connection.Write(response)
 		if err != nil {
 			fmt.Println("Failed to write:", err)
 			continue
