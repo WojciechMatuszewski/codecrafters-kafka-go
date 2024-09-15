@@ -92,18 +92,21 @@ func connectionLoop(connection net.Conn) {
 		return
 	}
 
-	// receivedLength := received[:4]
-	// // receivedHeader := received[4:8]
-	receivedMessage := received[8:12]
+	// messageLength := received[:4]
+	messageHeader := received[4:8]
 
-	// fmt.Println("Received data:", string(receivedLength))
+	// // 0 -> 4 length
+	// // 4 -> 8 header
+	// // 8 -> xxx message
 
-	header := make([]byte, 4)
-	message := receivedMessage
+	// receivedMessage := received[8:12]
+
+	length := make([]byte, 4)
+	header := messageHeader
 
 	var response []byte
+	response = append(response, length...)
 	response = append(response, header...)
-	response = append(response, message...)
 
 	_, err = connection.Write(response)
 	if err != nil {
