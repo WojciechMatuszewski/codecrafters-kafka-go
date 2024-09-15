@@ -93,25 +93,20 @@ func connectionLoop(connection net.Conn) {
 		return
 	}
 
-	messageLength := binary.BigEndian.Uint32(received[:4])
-	fmt.Println("Message length:", messageLength)
+	requestLength := binary.BigEndian.Uint32(received[:4])
+	requestApiKey := received[4:6]
+	requestApiVersion := received[6:8]
+	requestCorrelationId := received[8:12]
 
-	// Read the header (next 4 bytes)
-	messageHeader := received[4:8]
-	fmt.Println("Message header:", messageHeader)
+	fmt.Println("length", requestLength, "apiKey", requestApiKey, "apiVersion", requestApiVersion, "correlationId", requestCorrelationId)
 
-	// Read the body (remaining bytes)
-	messageBody := received[8:n]
-	fmt.Println("Message body:", messageBody)
-
-	// Prepare the response
 	length := make([]byte, 4)
-	binary.BigEndian.PutUint32(length, messageLength)
-	header := messageHeader
+	// binary.BigEndian.PutUint32(length, requestLength)
+	// header := messageHeader
 
 	var response []byte
 	response = append(response, length...)
-	response = append(response, header...)
+	response = append(response, requestCorrelationId...)
 
 	_, err = connection.Write(response)
 	if err != nil {
