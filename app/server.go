@@ -86,30 +86,19 @@ func connectionLoop(connection net.Conn) {
 	defer connection.Close()
 
 	received := make([]byte, 1024)
-	for {
-		connection.Read(received)
-		// if err != nil {
-		// 	if errors.Is(err, io.EOF) {
-		// 		continue
-		// 	}
+	connection.Read(received)
 
-		// 	fmt.Println("Failed to read:", err)
-		// 	continue
-		// }
+	fmt.Println("Received data:", string(received))
 
-		fmt.Println("Received data:", string(received))
+	header := make([]byte, 4)
+	message := []byte{0x00, 0x00, 0x00, 0x07}
 
-		header := make([]byte, 4)
-		message := []byte{0x00, 0x00, 0x00, 0x07}
+	var response []byte
+	response = append(response, header...)
+	response = append(response, message...)
 
-		var response []byte
-		response = append(response, header...)
-		response = append(response, message...)
-
-		_, err := connection.Write(response)
-		if err != nil {
-			fmt.Println("Failed to write:", err)
-			continue
-		}
+	_, err := connection.Write(response)
+	if err != nil {
+		fmt.Println("Failed to write:", err)
 	}
 }
