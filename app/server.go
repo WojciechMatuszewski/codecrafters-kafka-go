@@ -98,11 +98,11 @@ func connectionLoop(connection net.Conn) {
 		header := make([]byte, 4)
 		message := []byte{0x00, 0x00, 0x00, 0x07}
 
-		var res []byte
-		res = append(res, header...)
-		res = append(res, message...)
+		var response []byte
+		response = append(response, header...)
+		response = append(response, message...)
 
-		_, err = connection.Write(res)
+		_, err = connection.Write(response)
 		if err != nil {
 			fmt.Println("Failed to write:", err)
 			continue
