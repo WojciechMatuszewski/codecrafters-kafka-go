@@ -86,9 +86,14 @@ func connectionLoop(connection net.Conn) {
 	defer connection.Close()
 
 	received := make([]byte, 1024)
-	connection.Read(received)
+	_, err := connection.Read(received)
+	if err != nil {
+		fmt.Println("Failed to read the data:", err)
+		return
+	}
 
-	fmt.Println("Received data:", string(received))
+	receivedLength := received[:4]
+	fmt.Println("Received data:", string(receivedLength))
 
 	header := make([]byte, 4)
 	message := []byte{0x00, 0x00, 0x00, 0x07}
@@ -97,7 +102,7 @@ func connectionLoop(connection net.Conn) {
 	response = append(response, header...)
 	response = append(response, message...)
 
-	_, err := connection.Write(response)
+	_, err = connection.Write(response)
 	if err != nil {
 		fmt.Println("Failed to write:", err)
 	}
