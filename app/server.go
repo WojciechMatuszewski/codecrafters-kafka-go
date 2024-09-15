@@ -2,7 +2,9 @@ package main
 
 import (
 	"context"
+	"errors"
 	"fmt"
+	"io"
 	"net"
 	"os/signal"
 	"syscall"
@@ -89,6 +91,9 @@ func connectionLoop(connection net.Conn) {
 	for {
 		_, err := connection.Read(received)
 		if err != nil {
+			if errors.Is(err, io.EOF) {
+				continue
+			}
 			fmt.Println("Failed to read:", err)
 			continue
 		}
