@@ -87,7 +87,7 @@ func connectionLoop(connection net.Conn) {
 	defer connection.Close()
 
 	received := make([]byte, 1024)
-	n, err := connection.Read(received)
+	_, err := connection.Read(received)
 	if err != nil {
 		fmt.Println("Failed to read the data:", err)
 		return
@@ -101,8 +101,6 @@ func connectionLoop(connection net.Conn) {
 	fmt.Println("length", requestLength, "apiKey", requestApiKey, "apiVersion", requestApiVersion, "correlationId", requestCorrelationId)
 
 	length := make([]byte, 4)
-	// binary.BigEndian.PutUint32(length, requestLength)
-	// header := messageHeader
 
 	var response []byte
 	response = append(response, length...)
