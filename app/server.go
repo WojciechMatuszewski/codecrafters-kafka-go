@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"encoding/binary"
 	"fmt"
 	"net"
 	"os/signal"
@@ -86,22 +87,26 @@ func connectionLoop(connection net.Conn) {
 	defer connection.Close()
 
 	received := make([]byte, 1024)
-	_, err := connection.Read(received)
+	n, err := connection.Read(received)
 	if err != nil {
 		fmt.Println("Failed to read the data:", err)
 		return
 	}
 
-	// messageLength := received[:4]
+	messageLength := binary.BigEndian.Uint32(received[:4])
+	fmt.Println("Message length:", messageLength)
+
+	// Read the header (next 4 bytes)
 	messageHeader := received[4:8]
+	fmt.Println("Message header:", messageHeader)
 
-	// // 0 -> 4 length
-	// // 4 -> 8 header
-	// // 8 -> xxx message
+	// Read the body (remaining bytes)
+	messageBody := received[8:n]
+	fmt.Println("Message body:", messageBody)
 
-	// receivedMessage := received[8:12]
-
+	// Prepare the response
 	length := make([]byte, 4)
+	binary.BigEndian.PutUint32(length, messageLength)
 	header := messageHeader
 
 	var response []byte
