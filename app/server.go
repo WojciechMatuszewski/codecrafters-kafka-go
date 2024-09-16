@@ -93,10 +93,9 @@ func connectionLoop(connection net.Conn) {
 		return
 	}
 
-	requestLength := binary.BigEndian.Uint32(received[:4])
+	// requestLength := binary.BigEndian.Uint32(received[:4])
+	// requestApiKey := binary.BigEndian.Uint16(received[4:6])
 	requestApiVersion := binary.BigEndian.Uint16(received[6:8])
-
-	fmt.Println("Api version", requestApiVersion, "request length", string(requestLength))
 
 	requestCorrelationId := received[8:12]
 
@@ -105,6 +104,12 @@ func connectionLoop(connection net.Conn) {
 	responseLength := make([]byte, 4)
 	response = append(response, responseLength...)
 	response = append(response, requestCorrelationId...)
+	switch requestApiVersion {
+	case 0, 1, 2, 3, 4:
+		response = append(response, []byte{0, 0}...)
+	default:
+		response = append(response, []byte{0, 35}...)
+	}
 
 	_, err = connection.Write(response)
 	if err != nil {
